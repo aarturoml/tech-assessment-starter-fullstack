@@ -1,15 +1,15 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsIn, IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class CrearClaseDto {
   @IsString()
   @IsNotEmpty()
-  public codigo: string;
+  @Matches(/^\d$/, { message: 'El código de una clase debe tener 1 dígito' })
+  public codigo!: string;
   @IsString()
   @IsNotEmpty()
-  public nombre: string;
+  public nombre!: string;
   @IsString()
   @IsNotEmpty()
-  public naturaleza: string;
-
-  constructor(codigo: string, nombre: string, naturaleza: string) {}
+  @IsIn(['débito', 'crédito'])
+  public naturaleza!: 'débito' | 'crédito';
 }

@@ -1,11 +1,11 @@
-import { IsNotEmpty, IsSemVer, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class CrearGrupoDto {
   @IsString()
   @IsNotEmpty()
-  public codigo: string;
+  @Matches(/^\d{2}$/, { message: 'El código de un grupo debe tener 2 dígitos' })
+  public codigo!: string;
   @IsString()
   @IsNotEmpty()
-  public nombre: string;
-  constructor(codigo: string, nombre: string) {}
+  public nombre!: string;
 }

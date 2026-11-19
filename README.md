@@ -1,47 +1,204 @@
-# Arranque de la prueba técnica full-stack
+# Aravia - Catálogo de cuentas
 
-Backend y frontend listos para correr, ya conectados entre sí. Es el punto de partida de la prueba, para que no gastes tiempo en instalar y configurar.
+Módulo full-stack para administrar el catálogo jerárquico de cuentas de una empresa.
+![alt text](image-4.png)
 
-| Carpeta | Qué hay | Puerto |
-|---------|---------|:------:|
-| `api/` | NestJS con TypeScript, con CORS habilitado hacia el front | 3000 |
-| `web/` | React con Vite y TypeScript | 5173 |
+## Descripción
 
-Trae **solo lo que generan los CLI de Nest y de Vite**. No hay estructura de capas, ni entidades, ni interfaces de repositorio, ni librería de componentes, ni manejo de estado. Esas decisiones son tuyas y son parte de lo que se evalúa, así que cuéntanos en voz alta por qué las tomas. Si quieres reorganizar las carpetas, hazlo y explica por qué.
+El sistema permite crear, consultar y eliminar cuentas contables respetando las reglas del catálogo:
+
+- Las clases tienen códigos de 1 dígito.
+- Los grupos tienen códigos de 2 dígitos.
+- Las cuentas tienen códigos de 4 dígitos.
+- Las subcuentas tienen códigos de 6 dígitos.
+- Una cuenta no puede crearse si su padre no existe.
+- El código debe ser único.
+- La naturaleza débito/crédito se hereda desde la clase.
+- No se puede eliminar una cuenta que tenga hijos.
+- Solo las cuentas hoja pueden recibir movimientos contables.
+
+## Funcionalidades implementadas
+
+### Backend
+
+- API REST desarrollada con NestJS y TypeScript.
+- Arquitectura basada en:
+  - Entidades de dominio.
+  - DTOs.
+  - Casos de uso.
+  - Repositorio.
+  - Controlador.
+- Persistencia temporal en memoria.
+- Validación de códigos, nombres, padres y naturaleza.
+- Creación unificada mediante `POST /cuenta`.
+- Consulta del catálogo completo.
+- Consulta de una cuenta por código.
+- Eliminación de cuentas hoja.
+- Respuestas HTTP con errores descriptivos.
+- Pruebas unitarias de las reglas principales.
+
+### Frontend
+
+- Interfaz desarrollada con React, TypeScript y Vite.
+- Formulario para crear cuentas.
+- Selección de naturaleza para las clases.
+- Visualización jerárquica del catálogo.
+- Identificación de cuentas hoja.
+- Eliminación de cuentas.
+- Mensajes de éxito y error.
+- Diseño responsive básico.
+
+## Arquitectura
+
+```text
+api/src/cuenta
+├── application
+│   └── use-cases
+├── domain
+│   ├── dto
+│   ├── entities
+│   ├── errors
+│   └── repositories
+├── infrastruture
+│   └── repositories
+├── cuenta.controller.ts
+└── cuenta.module.ts
+```
+
+El frontend consume la API mediante funciones centralizadas en:
+
+```text
+web/src/api.ts
+```
+
+## Endpoints principales
+
+| Método   | Endpoint          | Descripción                               |
+| -------- | ----------------- | ----------------------------------------- |
+| `GET`    | `/cuenta`         | Lista todas las cuentas                   |
+| `GET`    | `/cuenta/:codigo` | Consulta una cuenta                       |
+| `POST`   | `/cuenta`         | Crea una clase, grupo, cuenta o subcuenta |
+| `DELETE` | `/cuenta/:codigo` | Elimina una cuenta sin hijos              |
+
+### Ejemplo de creación de una clase
+
+```json
+{
+  "codigo": "1",
+  "nombre": "Activo",
+  "naturaleza": "débito"
+}
+```
+
+### Ejemplo de creación de una subcuenta
+
+```json
+{
+  "codigo": "110505",
+  "nombre": "Caja general"
+}
+```
+
+## Imágenes del proyecto
+
+> Reemplazar los siguientes espacios por capturas reales de la aplicación.
+
+### Catálogo de cuentas
+
+<!-- Insertar aquí una imagen del catálogo -->
+
+![Catálogo de cuentas](image-1.png)
+
+### Formulario de creación
+
+<!-- Insertar aquí una imagen del formulario -->
+
+![Formulario de creación](image-2.png)
+
+### Validación o mensaje de error
+
+<!-- Insertar aquí una imagen de validaciones -->
+
+![Validaciones](image-3.png)
 
 ## Requisitos
 
-- **Node 22** (está en `.nvmrc`, con `nvm use` queda listo).
-- **npm 10 o superior.** Con npm 9.2 la instalación falla. Revisa con `npm -v` antes de empezar.
+- Node.js 22.
+- npm 10 o superior.
 
-## Cómo correrlo
+## Instalación y ejecución
+
+Desde la raíz del proyecto:
 
 ```bash
-npm install     # instala la raíz, api/ y web/
-npm run dev     # levanta los dos a la vez
+npm install
+npm run dev
 ```
 
-Abre http://localhost:5173. Si ves *La API respondió: Hello World!*, el frontend está hablando con el backend y puedes empezar.
+Aplicaciones disponibles en:
 
-Esa pantalla existe solo para comprobar la conexión. Bórrala y construye lo tuyo.
+- Frontend: http://localhost:5173
+- API: http://localhost:3000
 
-## Scripts
+También pueden ejecutarse por separado:
 
-| Script | Qué hace |
-|--------|----------|
-| `npm run dev` | Levanta la API y el front juntos, en modo watch |
-| `npm run dev:api` | Solo la API |
-| `npm run dev:web` | Solo el front |
-| `npm run build` | Compila los dos |
-| `npm test` | Corre las pruebas de la API con Vitest |
-| `npm run lint` | Revisa los dos con oxlint |
+```bash
+npm run dev:api
+npm run dev:web
+```
 
-## Configuración
+## Pruebas y validaciones
 
-El front lee la URL de la API de `VITE_API_URL`. Si no defines la variable, usa `http://localhost:3000`, así que no tienes que configurar nada para empezar. El ejemplo está en [`web/.env.example`](./web/.env.example).
+Backend:
 
-La API acepta peticiones del origen que diga `WEB_ORIGIN`, y por defecto `http://localhost:5173`. Si cambias el puerto del front, cambia esa variable.
+```bash
+cd api
+npm test
+npm run build
+npm run lint
+```
 
-## Antes de entregar
+Frontend:
 
-Reemplaza este archivo por tu propio `README.md`, con cómo se corre tu proyecto, qué decisiones tomaste, qué dejaste afuera y qué harías con más tiempo.
+```bash
+cd web
+npm run build
+npm run lint
+```
+
+Las pruebas actuales cubren:
+
+- Creación de la jerarquía.
+- Herencia de naturaleza.
+- Validación de padre inexistente.
+- Rechazo de códigos duplicados.
+- Restricción de eliminación de cuentas con hijos.
+- Eliminación de cuentas hoja.
+
+## Decisiones y limitaciones actuales
+
+- Se utilizó un repositorio en memoria para mantener el alcance de la prueba y evitar configuración adicional de base de datos.
+- El catálogo se reinicia cuando se reinicia la API.
+- Los movimientos contables no se almacenan todavía; únicamente se informa si una cuenta puede recibirlos.
+- El frontend es intencionalmente básico y está enfocado en demostrar el flujo principal.
+
+## Mejoras posibles con más tiempo
+
+- Incorporar una base de datos real con migraciones.
+- Agregar persistencia por empresa o compañía.
+- Implementar autenticación y autorización.
+- Agregar edición de nombres y metadatos de cuentas.
+- Incorporar movimientos contables reales y validar que solo se registren en cuentas hoja.
+- Añadir paginación, búsqueda y filtros.
+- Mejorar la visualización del árbol con expansión y colapsado de nodos.
+- Agregar pruebas e2e completas para todos los endpoints.
+- Incorporar documentación OpenAPI/Swagger.
+- Mejorar accesibilidad y agregar pruebas visuales.
+- Añadir manejo de concurrencia y restricciones de unicidad a nivel de base de datos.
+- Crear un sistema de auditoría para registrar cambios en el catálogo.
+
+## Uso de inteligencia artificial
+
+La implementación se completó utilizando IA como apoyo durante el desarrollo. Se utilizó para revisar la estructura inicial, identificar errores, proponer la arquitectura, implementar las reglas de negocio, crear pruebas, construir la interfaz y revisar los resultados de compilación y lint.
+
+Al finalizar, se logró completar la funcionalidad solicitada del proyecto, incluyendo backend, frontend básico, validaciones y pruebas.
