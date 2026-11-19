@@ -1,0 +1,1 @@
+export const CUENTA_REPOSITORY = Symbol('CUENTA_REPOSITORY');
